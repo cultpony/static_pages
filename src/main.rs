@@ -26,8 +26,9 @@ impl Asset {
         let options = Options::empty();
         let page: &str = page.as_ref();
         println!("Rendering {page}.{lang}.md");
-        let Some(page_data) = Asset::get(&format!("{page}.{lang}.md")) else {
-          bail!("Page not found")
+        let page_data = match Asset::get(&format!("{page}.{lang}.md")) {
+            Some(v) => v,
+            None => bail!("Page not found"),
         };
         let page_data = page_data.data.as_ref();
         let mut page_data = std::str::from_utf8(page_data)?.to_owned();
@@ -145,6 +146,8 @@ async fn main() -> Result<()> {
         .route("/imprint", axum::routing::get(imprint))
         .route("/privacy", axum::routing::get(privacy))
         .route("/*file", axum::routing::get(static_file));
+        
+    println!("Running static pages server");
 
     axum::Server::bind(&"0.0.0.0:3077".parse()?)
         .serve(app.into_make_service())
