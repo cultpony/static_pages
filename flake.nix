@@ -1,50 +1,48 @@
 {
-  description = "A basic Go web server setup";
-
   inputs = {
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    utils.url = "github:numtide/flake-utils";
-
-    naersk = {
-      url = "github:nix-community/naersk";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "utils";
-    };
   };
 
-  outputs = { self, nixpkgs, utils, naersk, rust-overlay }:
+  outputs = { self, fenix, flake-utils, nixpkgs }:
+    flake-utils.lib.eachDefaultSystem (system: 
     let
-      pkgs = import nixpkgs {
-        system = "x86_64-linux";
-        overlays = [ rust-overlay.overlays.default ];
+      toolchain = fenix.packages.${system}.stable.toolchain;
+      pkgs = nixpkgs.legacyPackages.${system};
+    in
+    {
+      devShells.default = pkgs.mkShell {
+        nativeBuildInputs =
+            [
+              pkgs.cargo-nextest
+              fenix.packages.${system}.stable.toolchain
+            ];
       };
-      version = builtins.substring 0 0 self.lastModifiedDate;
-      rust = (pkgs.rust-bin.stable."1.64.0".default.override {
-        extensions = [ "rust-src" ];
-      });
-      naersk' = pkgs.callPackage naersk {
-        rustc = rust;
-        cargo = rust;
-      };
-    in {
-      packages.x86_64-linux.default = naersk'.buildPackage {
-        src = ./.;
-      };
+      packages.default =
 
-      nixosModules.static-pages = import ./service.nix self;
+        (pkgs.makeRustPlatform {
+          cargo = toolchain;
+          rustc = toolchain;
+          withComponents = with pkgs; [
+            nixpkgs.cargo-nextest
+          ];
+        }).buildRustPackage {
+          pname = "static_pages";
+          version = "0.1.0";
 
-      apps.x86_64-linux.default =
-        utils.lib.mkApp { drv = self.packages.x86_64-linux.static-pages; exePath = "/bin/static_pages"; };
+          src = ./.;
 
-      devShells.x86_64-linux.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          rust
-        ];
-      };
-  };
+          cargoLock.lockFile = ./Cargo.lock;
+
+          # disable networked tests
+          checkNoDefaultFeatures = true;
+          checkFeatures = [ ];
+
+          useNextest = true;
+        };
+    });
 }
