@@ -1,9 +1,9 @@
 flake: { config, lib, pkgs, ... }:
 
 let
-  inherit (lib) mkEnableOption;
+  inherit (lib) mkEnableOption mkOption types;
 
-  inherit (flake.packages.x86_64-linux) static-pages;
+  inherit (flake.packages.${pkgs.stdenv.hostPlatform.system}) static-pages;
 
   cfg = config.services.static-pages;
 in
@@ -13,10 +13,48 @@ in
       enable = mkEnableOption ''
         Static-Pages for CULT PONY
       '';
+
+      package = mkOption {
+        type = types.package;
+        default = flake.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        description = ''
+          The static_pages package to use
+        '';
+      };
+
+      mainDomain = mkOption {
+        type = types.str;
+        default = "imprint.example.com";
+        description = ''
+          Primary Domain of the service
+        '';
+      };
+
+      domains = mkOption {
+        type = types.listOf types.str;
+        default = [ ];
+        example = [ "imprint.example.com" "exmple.com" ];
+        description = ''
+          List of domains to configure Nginx for
+        '';
+      };
+
     };
- };
+  };
 
   config = lib.mkIf cfg.enable {
+
+    services.nginx.virtualHosts.${cfg.mainDomain} = {
+      serverName = cfg.mainDomain;
+      serverAliases = cfg.domains;
+      forceSSL = false;
+      enableACME = false;
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:3077/";
+        proxyWebsockets = true;
+        recommendedProxySettings = true;
+      };
+    };
 
     systemd.services.static-pages = {
       description = "Static Pages to Serve";
@@ -26,7 +64,7 @@ in
 
       serviceConfig = {
         Restart = "on-failure";
-        ExecStart = "${static-pages}/bin/static_pages";
+        ExecStart = "${lib.getBin cfg.package}/bin/static_pages";
         StateDirectory = "static-pages";
         StateDirectoryMode = "0750";
 
