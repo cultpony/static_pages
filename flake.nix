@@ -22,6 +22,9 @@
               fenix.packages.${system}.stable.toolchain
             ];
       };
+
+      nixosModules.default = import ./service.nix self;
+
       packages.default =
 
         (pkgs.makeRustPlatform {
