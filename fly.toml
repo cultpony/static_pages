@@ -27,7 +27,7 @@ primary_region = 'ams'
     grace_period = "1s"
     interval = "60s"
     method = "GET"
-    path = "/"
+    path = "/health"
     timeout = "1s"
     
 
