@@ -2,7 +2,7 @@
 
 **Tim Schuster**
 
-**Adress:** Johannes-Haag-Straße 4, 86153 Augsburg
+**Adress:** Utengasse 44, CH-4058 Basel, Switzerland
 
 **E-Mail:** `legal@tscs37.eu`
 

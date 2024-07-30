@@ -51,5 +51,3 @@ We do not send data to third parties or store personal data beyond what is neces
 ## Third party privacy policy
 
 Some of our services transfer personal data to third parties. Except in the case of the pony.social service, they fall under the same data protection regulations or receive only encrypted data for which a data protection regulation of third parties is not necessary.
-
-Translated with www.DeepL.com/Translator
