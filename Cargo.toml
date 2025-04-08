@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "1.39", features = ["full"] }
+tokio = { version = "1.44", features = ["full"] }
 axum = { version = "0.7", features = ["tracing", "http2", "macros"] }
 maud = { version = "0.26", features = ["axum"] }
 rust-embed = "8.5"
