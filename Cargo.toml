@@ -15,5 +15,5 @@ hex = "0.4.3"
 pulldown-cmark = "0.11"
 color-eyre = "0.6"
 regex = "1.10"
-tracing = { version = "0.1.40", features = ["release_max_level_info"] }
+tracing = { version = "0.1.41", features = ["release_max_level_info"] }
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
