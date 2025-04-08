@@ -12,7 +12,7 @@ maud = { version = "0.26", features = ["axum"] }
 rust-embed = "8.5"
 mime_guess = "2.0.4"
 hex = "0.4.3"
-pulldown-cmark = "0.11"
+pulldown-cmark = "0.13"
 color-eyre = "0.6"
 regex = "1.10"
 tracing = { version = "0.1.40", features = ["release_max_level_info"] }
